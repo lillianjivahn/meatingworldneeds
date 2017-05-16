@@ -1,0 +1,153 @@
+%% Freshman seminar plots
+
+set(0, 'DefaultAxesFontSize',15,'DefaultLineLineWidth',1.5,...
+    'DefaultLineMarkerSize',2);
+
+% Country by country data -- the data is for year 2015, and is in
+% kg/capita/year
+fid = fopen('countries_data.java');
+A = textscan(fid,'%s %s %f');
+fclose(fid);
+country = A{:,1};
+meat = A{:,2};
+meat_consumed = A{:,3};
+
+
+% Sort the countries' meat consumption for each type of meat
+
+for i = 1:length(meat_consumed)/4
+    beef(i) = meat_consumed(4*i-3);
+    pig(i) = meat_consumed(4*i-2);
+    chicken(i) = meat_consumed(4*i-1);
+    sheep(i) = meat_consumed(4*i);
+    country_trimmed(i) = country(4*i);
+end
+
+country_actual = {'AUSTRALIA';'CANADA';'JAPAN';'SOUTH KOREA';'MEXICO';...
+    'NEW ZEALAND';'TURKEY';'USA';'ALGERIA';'ARGENTINA';'BANGLADESH';'BRAZIL';...
+    'CHILE';'CHINA';'COLOMBIA';'EGYPT';'ETHIOPIA';'GHANA';'HAITI';...
+    'INDIA';'INDONESIA';'IRAN';'ISRAEL';'KAZAKHSTAN';'MALAYSIA';...
+    'MOZAMBIQUE';'NIGERIA';'PAKISTAN';'PARAGUAY';'PERU';'PHILIPPINES';...
+    'RUSSIA';'SAUDI ARABIA';'SOUTH AFRICA';'SUDAN';'TANZANIA';'THAILAND';...
+    'UKRAINE';'URUGUAY';'VIETNAM';'ZAMBIA';'WORLD';'SUB-SAHARAN AFRICA';...
+    'OECD';'BRICS';'EUROPEAN UNION'};
+country_actual(43:45) = [];
+beef(43:45) = [];
+chicken(43:45) = [];
+pig(43:45) = [];
+
+ct1 = country_actual;
+ct2 = country_actual;
+ct3 = country_actual;
+ct4 = country_actual;
+percent = [1,1,1];
+
+
+% Calculate total carbon / food impact of each country
+
+ct5 = country_actual;
+cO2 = [68.8, 7.9, 5.4, NaN];
+for i = 1:length(ct5)
+    c(i) = beef(i)*cO2(1)/percent(1) + pig(i)*cO2(2)/percent(2) ...
+        + chicken(i)*cO2(3)/percent(3);
+end
+
+for i = 1:length(ct5)
+    for j = i:length(ct5)
+        if c(i) < c(j)
+            [c(i) c(j)] = deal(c(j), c(i));
+            [ct5(i) ct5(j)] = deal(ct5(j), ct5(i));
+        end
+    end
+end
+
+figure(5)
+hold on
+b = bar(1:43,c,1,'b');
+bar(25,c(25),1,'c')
+%bar(11,c(11),'g')
+%bar(13,c(13),'g')
+%bar(30,c(30),'g')
+%bar(39,c(39),'g')
+xlabel('Country','FontSize',20,'FontWeight','bold')
+ylabel({'Total Per Capita CO2 Impact due to';'Meat Consumption (kg/capita/year in 2015)'}, ...
+    'FontSize',20,'FontWeight','bold')
+set(gca, 'XTick', 1:43, 'XTickLabel', ct5) %,'XTickLabelRotation',90);
+grid on
+view(90,90)
+hold off
+
+for i = 1:length(beef)
+    for j = i:length(beef)
+        if beef(i) < beef(j)
+            [beef(i) beef(j)] = deal(beef(j), beef(i));
+            [ct1(i) ct1(j)] = deal(ct1(j), ct1(i));
+        end
+        if pig(i) < pig(j)
+            [pig(i) pig(j)] = deal(pig(j), pig(i));
+            [ct2(i) ct2(j)] = deal(ct2(j), ct2(i));
+        end
+        if chicken(i) < chicken(j)
+            [chicken(i) chicken(j)] = deal(chicken(j), chicken(i));
+            [ct3(i) ct3(j)] = deal(ct3(j), ct3(i));
+        end
+        if sheep(i) < sheep(j)
+            [sheep(i) sheep(j)] = deal(sheep(j), sheep(i));
+            [ct4(i) ct4(j)] = deal(ct4(j), ct4(i));
+        end
+    end
+end
+
+beef = beef / percent(1);
+pig = pig / percent(2);
+chicken = chicken / percent(3);
+
+figure(1)
+hold on
+bar(1:43,beef,1,'b');
+bar(24,beef(24),1,'c')
+set(gca, 'XTick', 1:43, 'XTickLabel', ct1) %,'XTickLabelRotation',90);
+xlabel('Country','FontSize',20,'FontWeight','bold')
+ylabel('Quantity of Beef Consumed (kg/capita/year in 2015)','FontSize',20, ...
+    'FontWeight','bold')
+view(90,90)
+grid on
+hold off
+
+figure(2)
+hold on
+bar(1:43,pig,1,'b');
+bar(16,pig(16),1,'c')
+set(gca, 'XTick', 1:43, 'XTickLabel', ct2) %,'XTickLabelRotation',90);
+xlabel('Country','FontSize',20,'FontWeight','bold')
+ylabel('Quantity of Pork Consumed (kg/capita/year in 2015)','FontSize',20, ...
+    'FontWeight','bold')
+view(90,90)
+grid on
+hold off
+
+figure(3)
+hold on
+bar(1:43,chicken,1,'b');
+bar(25,chicken(25),1,'c')
+set(gca, 'XTick', 1:43, 'XTickLabel', ct3) %,'XTickLabelRotation',90);
+xlabel('Country','FontSize',20,'FontWeight','bold')
+ylabel('Quantity of Poultry Consumed (kg/capita/year in 2015)','FontSize',20, ...
+    'FontWeight','bold')
+view(90,90)
+grid on
+hold off
+
+
+%%
+figure(4)
+hold on
+b4 = bar(1:46,sheep);
+set(gca, 'XTick', 1:46, 'XTickLabel', ct4) %,'XTickLabelRotation',90);
+%h = get(b4,'child');
+%set(h,'barwidth',5)
+xlabel('Country')
+ylabel('Quantity of Sheep consumed (kg/capita/year)')
+view(90,90)
+hold off
+

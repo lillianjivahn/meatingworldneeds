@@ -1,0 +1,209 @@
+%% Meat consumption by location
+
+set(0, 'DefaultAxesFontSize',15,'DefaultLineLineWidth',1.5,...
+    'DefaultLineMarkerSize',2);
+
+% Country by country data -- the data is for year 2015, and is in
+% kg/capita/year
+
+
+fid = fopen('countries_data.java');
+A = textscan(fid,'%s %s %f');
+fclose(fid);
+country = A{:,1};
+meat = A{:,2};
+meat_consumed = A{:,3};
+
+
+% Sort the countries' meat consumption for each type of meat
+
+for i = 1:length(meat_consumed)/4
+    beef(i) = meat_consumed(4*i-3);
+    pig(i) = meat_consumed(4*i-2);
+    chicken(i) = meat_consumed(4*i-1);
+    sheep(i) = meat_consumed(4*i);
+    country_trimmed(i) = country(4*i);
+end
+
+country_actual = {'AUSTRALIA';'CANADA';'JAPAN';'SOUTH KOREA';'MEXICO';...
+    'NEW ZEALAND';'TURKEY';'USA';'ALGERIA';'ARGENTINA';'BANGLADESH';'BRAZIL';...
+    'CHILE';'CHINA';'COLOMBIA';'EGYPT';'ETHIOPIA';'GHANA';'HAITI';...
+    'INDIA';'INDONESIA';'IRAN';'ISRAEL';'KAZAKHSTAN';'MALAYSIA';...
+    'MOZAMBIQUE';'NIGERIA';'PAKISTAN';'PARAGUAY';'PERU';'PHILIPPINES';...
+    'RUSSIA';'SAUDI ARABIA';'SOUTH AFRICA';'SUDAN';'TANZANIA';'THAILAND';...
+    'UKRAINE';'URUGUAY';'VIETNAM';'ZAMBIA';'WORLD';'SUB-SAHARAN AFRICA';...
+    'OECD';'BRICS';'EUROPEAN UNION'};
+
+country_actual(42:45) = [];
+beef(42:45) = [];
+pig(42:45) = [];
+chicken(42:45) = [];
+
+ct1 = country_actual;
+ct2 = country_actual;
+ct3 = country_actual;
+ct4 = country_actual;
+percent = [1,1,1];
+
+
+% Calculate total carbon / food impact of each country
+
+ct5 = country_actual;
+cO2 = [68.8, 7.9, 5.4, NaN];
+for i = 1:length(ct5)
+    c(i) = beef(i)*cO2(1)/percent(1) + pig(i)*cO2(2)/percent(2) ...
+        + chicken(i)*cO2(3)/percent(3);
+end
+
+for i = 1:length(ct5)
+    for j = i:length(ct5)
+        if c(i) < c(j)
+            [c(i) c(j)] = deal(c(j), c(i));
+            [ct5(i) ct5(j)] = deal(ct5(j), ct5(i));
+        end
+    end
+end
+
+s_america = [1,2,4,5,10,14,26];
+africa = [16,19,23,29,32,34,37:40];
+m_east = [7,22,27,31];
+asia = [11,15,17,21,24,25,30,35,36,28,41,42];
+america = [3,8,18,33];
+europe = [12,13,20];
+australia = [6,9];
+very_high = [2,3,6:10,12,13,15,24,27];
+high = [1,4,11,14,18,20:22,25,26,31,32,35];
+medium = [5,16,17,19,23,28,30,36,40:42];
+low = [29,33,34,37:39];
+
+temp = [medium,low];
+
+figure(1)
+hold on
+ba = bar(very_high,c(very_high),1,'g');
+bb = bar(high,c(high),1,'y');
+bc = bar(temp,c(temp),1,'r');
+%bar(low,c(low),1,'r');
+xlabel('Country','FontSize',20,'FontWeight','bold')
+ylabel({'Total Per Capita CO2 Impact due to';'Meat Consumption (kg/capita/year in 2015)'},'FontSize', ...
+    20,'FontWeight','bold')
+set(gca, 'XTick', 1:42, 'XTickLabel', ct5) %,'XTickLabelRotation',90);
+l1 = legend([ba,bb,bc],'Very High HDI','High HDI','Medium / Low HDI','Location','SouthEast');
+set(l1,'FontSize',20)
+grid on
+view(90,90)
+hold off
+
+figure(2)
+hold on
+bar(1:42,c,1,'b');
+b2 = bar(africa,c(africa),1,'m');
+xlabel('Country','FontSize',20,'FontWeight','bold')
+ylabel({'Total Per Capita CO2 Impact due to';'Meat Consumption (kg/capita/year in 2015)'},'FontSize', ...
+    20,'FontWeight','bold')
+set(gca, 'XTick', 1:42, 'XTickLabel', ct5) %,'XTickLabelRotation',90);
+l2 = legend([b2],'Africa','Location','SouthEast');
+set(l2,'FontSize',20)
+view(90,90)
+grid on
+hold off
+
+figure(3)
+hold on
+bar(1:42,c,1,'b');
+b3 = bar(s_america,c(s_america),1,'g');
+xlabel('Country','FontSize',20,'FontWeight','bold')
+ylabel({'Total Per Capita CO2 Impact due to';'Meat Consumption (kg/capita/year in 2015)'},'FontSize', ...
+    20,'FontWeight','bold')
+set(gca, 'XTick', 1:42, 'XTickLabel', ct5) %,'XTickLabelRotation',90);
+l3 = legend([b3],'South America','Location','SouthEast');
+set(l3,'FontSize',20)
+view(90,90)
+grid on
+hold off
+
+t = c';
+
+figure(4)
+hold on
+bar(1:41,c(1:41),1,'b');
+b3 = bar(42,c(42),1,'r');
+xlabel('Country','FontSize',20,'FontWeight','bold')
+ylabel({'Total Per Capita CO2 Impact due to';'Meat Consumption (kg/capita/year in 2015)'},'FontSize', ...
+    20,'FontWeight','bold')
+set(gca, 'XTick', 1:42, 'XTickLabel', ct5) %,'XTickLabelRotation',90);
+l3 = legend([b3],'India','Location','SouthEast');
+set(l3,'FontSize',20)
+view(90,90)
+grid on
+hold off
+
+
+%%
+for i = 1:length(beef)
+    for j = i:length(beef)
+        if beef(i) < beef(j)
+            [beef(i) beef(j)] = deal(beef(j), beef(i));
+            [ct1(i) ct1(j)] = deal(ct1(j), ct1(i));
+        end
+        if pig(i) < pig(j)
+            [pig(i) pig(j)] = deal(pig(j), pig(i));
+            [ct2(i) ct2(j)] = deal(ct2(j), ct2(i));
+        end
+        if chicken(i) < chicken(j)
+            [chicken(i) chicken(j)] = deal(chicken(j), chicken(i));
+            [ct3(i) ct3(j)] = deal(ct3(j), ct3(i));
+        end
+        if sheep(i) < sheep(j)
+            [sheep(i) sheep(j)] = deal(sheep(j), sheep(i));
+            [ct4(i) ct4(j)] = deal(ct4(j), ct4(i));
+        end
+    end
+end
+
+beef = beef / percent(1);
+pig = pig / percent(2);
+chicken = chicken / percent(3);
+
+s_america = [1,2,3,5,10,13,27];
+africa = [15,16,18,25,28,30,35,38,40,41];
+asia = [9,17,20,22,24,26,31,33,36,37,39,42];
+america = [4,8,19,32];
+australia = [6,11];
+m_east = [7,21,29,34];
+europe = [12,14,23];
+
+figure(1)
+hold on
+bar(s_america,beef(s_america),'b');
+bar(africa,beef(africa),'r');
+bar(asia,beef(asia),'m');
+bar(america,beef(america),0.2,'c');
+bar(australia,beef(australia),0.15);
+bar(m_east,beef(m_east),0.15,'y');
+bar(europe,beef(europe),0.4,'g');
+%bar(1:42,beef);
+set(gca, 'XTick', 1:42, 'XTickLabel', ct1) %,'XTickLabelRotation',90);
+xlabel('Country')
+ylabel('Quantity of Beef consumed (kg/capita/year)')
+view(90,90)
+hold off
+
+figure(2)
+hold on
+bar(1:42,pig,'b');
+set(gca, 'XTick', 1:42, 'XTickLabel', ct2) %,'XTickLabelRotation',90);
+xlabel('Country')
+ylabel('Quantity of pork consumed (kg/capita/year)')
+view(90,90)
+hold off
+
+figure(3)
+hold on
+bar(1:42,chicken,'b');
+set(gca, 'XTick', 1:42, 'XTickLabel', ct3) %,'XTickLabelRotation',90);
+xlabel('Country')
+ylabel('Quantity of poultry consumed (kg/capita/year)')
+view(90,90)
+hold off
+
